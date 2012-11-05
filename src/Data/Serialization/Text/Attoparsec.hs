@@ -16,8 +16,10 @@ import qualified Data.Attoparsec.ByteString as AB
 import qualified Data.Attoparsec.ByteString.Lazy as ALB
 import qualified Data.Attoparsec.Text as AT
 import qualified Data.Attoparsec.Text.Lazy as ALT
-import Data.Serialization.Deserialize
-import Data.Serialization.Serializable
+import Data.Serialization.Combine
+import Data.Serialization.Wrap
+import Data.Serialization.Generic
+import Data.Serialization.Codec
 import Data.Monoid
 
 newtype Atto s a = Atto {
@@ -25,8 +27,8 @@ newtype Atto s a = Atto {
         deriving (Functor, Applicative, Alternative, Monad)
 
 -- | Attoparsec deserialize
-atto :: Parser s a -> Deserialize (Atto s) a
-atto p = Deserialize (Atto p)
+atto :: Parser s a -> Decoding (Atto s) a
+atto p = Decoding (Atto p)
 
 data AttoResult r =
     AttoFail String |
@@ -66,9 +68,10 @@ instance Parseable LT.Text T.Text where
     attoEOF _ = AT.endOfInput
     attoRest = AT.takeLazyText
 
-instance (Monoid c, Parseable s c) => Deserialization (Atto c) s where
-    runDeserialization (Atto p) s = result $ attoParse p s where
+instance GenericDecode (Atto c)
+instance (Monoid c, Parseable s c) => Deserializer (Atto c) s where
+    deserialize (Atto p) s = result $ attoParse p s where
         result (AttoFail s) = Left s
         result (AttoDone r) = Right r
-    deserializationEof h = Atto $ attoEOF h
+    deserializeEof h = Atto $ attoEOF h
     deserializeTail = Atto attoRest
