@@ -25,6 +25,8 @@ import Data.Monoid
 newtype Atto s a = Atto { attoParsec :: Parser s a }
     deriving (Functor, Applicative, Alternative, Monad)
 
+instance MonadFail (Atto s)
+
 -- | Attoparsec deserialize
 atto :: Parser s a -> Decoding (Atto s) a
 atto p = Decoding (Atto p)
