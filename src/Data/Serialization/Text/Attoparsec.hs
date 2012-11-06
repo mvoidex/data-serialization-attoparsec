@@ -22,9 +22,8 @@ import Data.Serialization.Generic
 import Data.Serialization.Codec
 import Data.Monoid
 
-newtype Atto s a = Atto {
-    attoParsec :: Parser s a }
-        deriving (Functor, Applicative, Alternative, Monad)
+newtype Atto s a = Atto { attoParsec :: Parser s a }
+    deriving (Functor, Applicative, Alternative, Monad)
 
 -- | Attoparsec deserialize
 atto :: Parser s a -> Decoding (Atto s) a
