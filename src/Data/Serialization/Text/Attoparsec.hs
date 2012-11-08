@@ -70,7 +70,7 @@ instance Parseable LT.Text T.Text where
     attoRest = AT.takeLazyText
 
 instance GenericDecode (Atto c)
-instance (Monoid c, Parseable s c) => Deserializer (Atto c) s where
+instance (Monoid c, Parseable s c) => Deserializer s (Atto c) where
     deserialize (Atto p) s = result $ attoParse p s where
         result (AttoFail s) = Left s
         result (AttoDone r) = Right r
